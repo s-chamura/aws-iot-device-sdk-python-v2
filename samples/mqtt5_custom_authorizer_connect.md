@@ -8,8 +8,6 @@ You will need to setup your Custom Authorizer so that the lambda function return
 
 MQTT5 introduces additional features and enhancements that improve the development experience with MQTT. You can read more about MQTT5 in the Python V2 SDK by checking out the [MQTT5 user guide](../documents/MQTT5_Userguide.md).
 
-Note: MQTT5 support is currently in **developer preview**. We encourage feedback at all times, but feedback during the preview window is especially valuable in shaping the final product. During the preview period we may make backwards-incompatible changes to the public API, but in general, this is something we will try our best to avoid.
-
 Your IoT Core Thing's [Policy](https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html) must provide privileges for this sample to connect. Below is a sample policy that can be used on your IoT Core Thing that will allow this sample to run as intended.
 
 <details>
@@ -41,32 +39,27 @@ Note that in a real application, you may want to avoid the use of wildcards in y
 
 # How to run
 
-### Direct MQTT via mTLS
+**Note** The sample also allows passing arguments to specify additional data your custom authorizer may need. The snippets below assume that the custom authorizer does not need these additional parameters, but in the general case, you will almost always need some of them depending on the authorizer's configuration and the associated Lambda function's internals.
+* `--custom_auth_username` - opaque string value passed to the authorizer via an MQTT Connect packet.  The authorizer's Lambda can check this value from the event JSON value it receives as input: `event.protocolData.mqtt.username`
+* `--custom_auth_password` - opaque binary value passed to the authorizer via an MQTT Connect packet.  The authorizer's Lambda can check this value from the event JSON value it receives as input: `event.protocolData.mqtt.password`
+* `--custom_auth_token_key_name` - (Signed authorizers only) The query string parameter name that the token value should be bound to in the MQTT Connect packet.
+* `--custom_auth_token_value` - (Signed authorizers only) An arbitrary value chosen by the user.  The user must also submit a digital signature of this value using the private key associated with the authorizer.
+* `--custom_auth_authorizer_signature` - (Signed authorizers only) a digital signature of the value of the `--custom_auth_token_value` parameter using the private key associated with the authorizer.  The binary signature value must be base64 encoded and then URI encoded; the SDK will not do this for you.
 
-To run the MQTT5 Custom Authorizer connect sample from the `samples` folder using mTLS, use the following command:
+## MQTT over TCP with TLS
+
+To run the MQTT5 Custom Authorizer connect sample from the `samples` folder using TCP, use the following command:
 
 ``` sh
-# For Windows: replace 'python3' with 'python' and '/' with '\'
-python3 mqtt5_custom_authorizer_connect.py --endpoint <endpoint> --cert <path to certificate> --key <path to private key> --custom_auth_authorizer_name <authorizer name>
+# For Windows: replace 'python3' with 'python'
+python3 mqtt5_custom_authorizer_connect.py --endpoint <endpoint> --custom_auth_authorizer_name <authorizer name>
 ```
 
-You can also pass a Certificate Authority file (CA) if your certificate and key combination requires it:
-
-``` sh
-# For Windows: replace 'python3' with 'python' and '/' with '\'
-python3 mqtt5_custom_authorizer_connect.py --endpoint <endpoint> --cert <path to certificate> --key <path to private key> --custom_auth_authorizer_name <authorizer name> --ca_file <path to CA file>
-```
-
-**Note** The sample also allows passing additional arguments (`--custom_auth_username`, `--custom_auth_password`, and `custom_auth_authorizer_signature`) to fullfil the additional data your custom authorizer may need. The examples above assume that the custom authorizer does not need these additional parameters.
-
-
-## Websockets
+## MQTT over Websockets with TLS
 
 To run the MQTT5 Custom Authorizer connect sample from the `samples` folder using Websockets, use the following command:
 
 ``` sh
-# For Windows: replace 'python3' with 'python' and '/' with '\'
+# For Windows: replace 'python3' with 'python'
 python3 mqtt5_custom_authorizer_connect.py --endpoint <endpoint> --use_websockets "true" --custom_auth_authorizer_name <authorizer name>
 ```
-
-**Note** The sample also allows passing additional arguments (`--custom_auth_username`, `--custom_auth_password`, and `custom_auth_authorizer_signature`) to fullfil the additional data your custom authorizer may need. The examples above assume that the custom authorizer does not need these additional parameters.
