@@ -405,12 +405,6 @@ class CommandLineUtils:
         cmdUtils.add_common_mqtt_commands()
         cmdUtils.add_common_logging_commands()
         cmdUtils.add_common_custom_authorizer_commands()
-        cmdUtils.register_command(CommandLineUtils.m_cmd_signing_region, "<str>",
-                                "The signing region used for the websocket signer",
-                                False, str)
-        cmdUtils.register_command(CommandLineUtils.m_cmd_region, "<str>",
-                                "The signing region used for the websocket signer",
-                                False, str)
         cmdUtils.register_command(CommandLineUtils.m_cmd_client_id, "<str>",
                                 "Client ID to use for MQTT connection (optional, default='test-*').",
                                 default="test-" + str(uuid4()))
@@ -418,7 +412,6 @@ class CommandLineUtils:
 
         cmdData = CommandLineUtils.CmdData()
         cmdData.input_endpoint = cmdUtils.get_command_required(CommandLineUtils.m_cmd_endpoint)
-        cmdData.input_signing_region = cmdUtils.get_command_required(CommandLineUtils.m_cmd_signing_region, CommandLineUtils.m_cmd_region)
         cmdData.input_custom_authorizer_name = cmdUtils.get_command(CommandLineUtils.m_cmd_custom_auth_authorizer_name)
         cmdData.input_custom_authorizer_signature = cmdUtils.get_command(CommandLineUtils.m_cmd_custom_auth_authorizer_signature)
         cmdData.input_custom_auth_password = cmdUtils.get_command(CommandLineUtils.m_cmd_custom_auth_password)
@@ -468,6 +461,7 @@ class CommandLineUtils:
         cmdUtils.register_command(CommandLineUtils.m_cmd_port, "<int>", "Connection port. AWS IoT supports 443 and 8883 (optional, default=8883).", type=int)
         cmdUtils.register_command(CommandLineUtils.m_cmd_thing_name, "<str>", "The name assigned to your IoT Thing", required=True)
         cmdUtils.register_command(CommandLineUtils.m_cmd_job_time, "<int>", "Emulate working on a job by sleeping this many seconds (optional, default='5')", default=5, type=int)
+        cmdUtils.register_command(CommandLineUtils.m_cmd_mqtt_version, "<int>", "mqtt version (optional, default='5')", default=5, type=int)
         cmdUtils.get_args()
 
         cmdData = CommandLineUtils.CmdData()
@@ -482,19 +476,13 @@ class CommandLineUtils:
         cmdData.input_thing_name = cmdUtils.get_command_required(CommandLineUtils.m_cmd_thing_name)
         cmdData.input_job_time = int(cmdUtils.get_command(CommandLineUtils.m_cmd_job_time, 5))
         cmdData.input_is_ci = cmdUtils.get_command(CommandLineUtils.m_cmd_is_ci, None) != None
+        cmdData.input_mqtt_version = int(cmdUtils.get_command(CommandLineUtils.m_cmd_mqtt_version, 5))
         return cmdData
 
     def parse_sample_input_mqtt5_custom_authorizer_connect():
         cmdUtils = CommandLineUtils(
             "Custom Authorizer Connect - Make a MQTT5 Client connection using a custom authorizer.")
         cmdUtils.add_common_mqtt_commands()
-        cmdUtils.register_command(CommandLineUtils.m_cmd_key_file, "<path>",
-                                "Path to your key in PEM format.", False, str)
-        cmdUtils.register_command(CommandLineUtils.m_cmd_cert_file, "<path>",
-                                "Path to your client certificate in PEM format.", False, str)
-        cmdUtils.register_command(CommandLineUtils.m_cmd_signing_region, "<str>",
-                                "The signing region used for the websocket signer",
-                                False, str)
         cmdUtils.add_common_logging_commands()
         cmdUtils.add_common_custom_authorizer_commands()
         cmdUtils.register_command(CommandLineUtils.m_cmd_client_id, "<str>",
@@ -505,9 +493,6 @@ class CommandLineUtils:
 
         cmdData = CommandLineUtils.CmdData()
         cmdData.input_endpoint = cmdUtils.get_command_required(CommandLineUtils.m_cmd_endpoint)
-        cmdData.input_signing_region = cmdUtils.get_command(CommandLineUtils.m_cmd_signing_region, None)
-        cmdData.input_cert = cmdUtils.get_command(CommandLineUtils.m_cmd_cert_file, None)
-        cmdData.input_key = cmdUtils.get_command(CommandLineUtils.m_cmd_key_file, None)
         cmdData.input_ca = cmdUtils.get_command(CommandLineUtils.m_cmd_ca_file, None)
         cmdData.input_custom_authorizer_name = cmdUtils.get_command(CommandLineUtils.m_cmd_custom_auth_authorizer_name)
         cmdData.input_custom_authorizer_signature = cmdUtils.get_command(CommandLineUtils.m_cmd_custom_auth_authorizer_signature)
@@ -894,3 +879,4 @@ class CommandLineUtils:
     m_cmd_pkcs12_file = "pkcs12_file"
     m_cmd_pkcs12_password = "pkcs12_password"
     m_cmd_region = "region"
+    m_cmd_mqtt_version = "mqtt_version"
